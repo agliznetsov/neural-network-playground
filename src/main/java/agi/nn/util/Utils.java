@@ -18,6 +18,10 @@ public class Utils {
         return res;
     }
 
+    public static double randUniform(double a, double b) {
+        return Math.random() * (b - a) + a;
+    }
+
     private static Color colorGradient(Color from, Color to, double w) {
         return new Color(
                 linearGradient(from.getRed(), to.getRed(), w),

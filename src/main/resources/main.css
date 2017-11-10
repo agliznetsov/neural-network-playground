@@ -5,7 +5,7 @@
 
 #toolBar {
     -fx-padding: 5 5 5 5;
-    -fx-spacing: 20px;
+    -fx-spacing: 30px;
     /*-fx-background-color: lightgray;*/
     -fx-alignment: baseline-left;
 }

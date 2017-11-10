@@ -13,16 +13,20 @@
             <HBox id="toolBar">
                 <HBox>
                     <Button onAction="#onReset">Reset</Button>
-                    <Button fx:id="playButton" onAction="#onPlay">Play</Button>
+                    <Button fx:id="playButton" onAction="#onPlay">Run</Button>
                     <Button onAction="#onStep">Step</Button>
                 </HBox>
                 <HBox spacing="5">
                     <Label>Iteration</Label>
-                    <Label styleClass="bold">0</Label>
+                    <Label styleClass="bold" fx:id="iterationLabel">0</Label>
+                </HBox>
+                <HBox spacing="5">
+                    <Label>IPS</Label>
+                    <Label styleClass="bold" fx:id="ipsLabel">0</Label>
                 </HBox>
                 <HBox spacing="5">
                     <Label>Loss</Label>
-                    <Label styleClass="bold">0</Label>
+                    <Label styleClass="bold" fx:id="lossLabel">0</Label>
                 </HBox>
                 <Label fx:id="error"></Label>
             </HBox>
@@ -34,7 +38,7 @@
             <VBox id="settings" spacing="5">
                 <HBox>
                     <Label>Problem</Label>
-                    <ComboBox fx:id="problem"></ComboBox>
+                    <ComboBox fx:id="problemBox"></ComboBox>
                 </HBox>
                 <HBox>
                     <Label>Noise</Label>
