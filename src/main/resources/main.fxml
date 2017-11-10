@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="agi.nn.ui.MainController" prefWidth="1200.0" prefHeight="800.0">
+    <stylesheets>
+        <URL value="@main.css"/>
+    </stylesheets>
+    <top>
+        <VBox>
+            <HBox id="toolBar">
+                <HBox>
+                    <Button onAction="#onReset">Reset</Button>
+                    <Button fx:id="playButton" onAction="#onPlay">Play</Button>
+                    <Button onAction="#onStep">Step</Button>
+                </HBox>
+                <HBox spacing="5">
+                    <Label>Iteration</Label>
+                    <Label styleClass="bold">0</Label>
+                </HBox>
+                <HBox spacing="5">
+                    <Label>Loss</Label>
+                    <Label styleClass="bold">0</Label>
+                </HBox>
+                <Label fx:id="error"></Label>
+            </HBox>
+            <Separator></Separator>
+        </VBox>
+    </top>
+    <left>
+        <HBox>
+            <VBox id="settings" spacing="5">
+                <HBox>
+                    <Label>Problem</Label>
+                    <ComboBox fx:id="problem"></ComboBox>
+                </HBox>
+                <HBox>
+                    <Label>Noise</Label>
+                    <ComboBox fx:id="noise"></ComboBox>
+                </HBox>
+                <Separator></Separator>
+                <HBox>
+                    <Label>Batch size</Label>
+                    <ComboBox fx:id="batchSize"></ComboBox>
+                </HBox>
+                <HBox>
+                    <Label>Learning rate</Label>
+                    <ComboBox fx:id="learningRate"></ComboBox>
+                </HBox>
+                <HBox>
+                    <Label>Activation</Label>
+                    <ComboBox fx:id="activation"></ComboBox>
+                </HBox>
+                <HBox>
+                    <Label>Regularization</Label>
+                    <ComboBox fx:id="regularization"></ComboBox>
+                </HBox>
+                <HBox>
+                    <Label>Regularization rate</Label>
+                    <ComboBox fx:id="regularizationRate"></ComboBox>
+                </HBox>
+            </VBox>
+            <Separator orientation="VERTICAL"></Separator>
+        </HBox>
+    </left>
+</BorderPane>

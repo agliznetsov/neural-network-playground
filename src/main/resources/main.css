@@ -1,0 +1,36 @@
+.bold {
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+}
+
+#toolBar {
+    -fx-padding: 5 5 5 5;
+    -fx-spacing: 20px;
+    /*-fx-background-color: lightgray;*/
+    -fx-alignment: baseline-left;
+}
+
+#toolBar Button {
+    -fx-min-width: 50px;
+}
+
+#settings {
+    -fx-padding: 5 5 5 5;
+}
+
+#settings Label {
+    -fx-min-width: 120px;
+}
+
+#settings HBox {
+    -fx-alignment: baseline-left;
+}
+
+#settings ComboBox {
+    -fx-min-width: 100px;
+}
+
+#error {
+    -fx-text-fill: red;
+    -fx-font-size: 18px;
+}
