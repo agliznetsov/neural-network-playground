@@ -4,10 +4,7 @@ import agi.nn.network.*;
 import agi.nn.problem.Feature;
 import agi.nn.problem.Problem;
 import agi.nn.problem.Sample;
-import agi.nn.problem.points.CircleProblem;
-import agi.nn.problem.points.Point;
-import agi.nn.problem.points.PointProblem;
-import agi.nn.util.Utils;
+import agi.nn.problem.points.*;
 import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,6 +12,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
@@ -25,15 +23,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static agi.nn.ui.ChartUtils.COLOR_MAP;
+
 public class MainController {
-    private static final int SAMPLES_COUNT = 100;
+    private static final int SAMPLES_COUNT = 250;
     private static final long SECOND = 1000000000;
     private static final long FRAME_DURATION = SECOND / 20;
-    private static final int NODE_SIZE = 100;
-    private static Color[] colorMap = Utils.linearGradient(100, Color.BLUE, Color.WHITE, Color.ORANGE);
 
     public Button playButton;
-    public ComboBox<String> problemBox;
+    public ComboBox<Problem> problem;
     public ComboBox<Double> regularizationRate;
     public ComboBox<RegularizationFunction> regularization;
     public ComboBox<ActivationFunction> activation;
@@ -50,9 +48,7 @@ public class MainController {
     int iteration;
     List<Sample> trainData;
     Network network;
-    PointProblem problem;
-    List<Feature> features;
-    LoopArray trainLossArray = new LoopArray(1000);
+    LoopArray trainLossArray = new LoopArray(2000);
     double trainLoss;
 
     AnimationTimer animationTimer;
@@ -83,11 +79,17 @@ public class MainController {
             }
         };
         reset();
-        draw();
         drawColors();
     }
 
     private void initControls() {
+        //TODO: configure network topology
+
+        ObservableList<Problem> problems = FXCollections.observableArrayList(
+                Arrays.asList(new CircleProblem(), new SpiralProblem(), new SinusProblem()));
+        problem.setItems(problems);
+        problem.setValue(problems.get(0));
+
         ObservableList<Double> ratios = FXCollections.observableArrayList(Arrays.asList(0.00001, 0.0001, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0));
 
         learningRate.setItems(ratios);
@@ -141,66 +143,15 @@ public class MainController {
         iterationLabel.setText(String.format("%,d", iteration));
         ipsLabel.setText(String.format("%.1f", ips));
         lossLabel.setText(String.format("%.4f", trainLoss));
-        ChartUtils.plot(lossCanvas, trainLossArray);
-        drawNetwork();
-    }
-
-    private void drawNetwork() {
-        GraphicsContext gc = networkCanvas.getGraphicsContext2D();
-        gc.setFill(Color.WHITE);
-        gc.fillRect(0,0, networkCanvas.getWidth(), networkCanvas.getHeight());
-
-        double w = NODE_SIZE / PointProblem.RADIUS / 2;
-        for (int x = 0; x < NODE_SIZE; x++) {
-            for (int y = 0; y < NODE_SIZE; y++) {
-                Point p = new Point((x - NODE_SIZE / 2) / w, (y - NODE_SIZE / 2) / w, 0.0);
-                network.forwardProp(Arrays.asList(
-                        problem.getFeatures().get(0).getInput(p),
-                        problem.getFeatures().get(1).getInput(p)
-                ));
-                for (int layer = 0; layer < network.getLayers().size(); layer++) {
-                    List<Node> nodes = network.getLayers().get(layer);
-                    for (int i = 0; i < nodes.size(); i++) {
-                        int xs = layer *(NODE_SIZE + 5);
-                        int ys = i * (NODE_SIZE + 5);
-                        gc.setFill(getColor(nodes.get(i).getOutput()));
-                        gc.fillRect(xs + x, ys + y, 1, 1);
-                    }
-                }
-            }
-        }
-
-        for (int layer = 0; layer < network.getLayers().size(); layer++) {
-            List<Node> nodes = network.getLayers().get(layer);
-            for (int i = 0; i < nodes.size(); i++) {
-                int xs = layer * (NODE_SIZE + 5);
-                int ys = i * (NODE_SIZE + 5);
-                gc.setStroke(Color.BLACK);
-                gc.strokeRect(xs, ys, NODE_SIZE, NODE_SIZE);
-
-                if (layer == network.getLayers().size() - 1) {
-                    for(Sample sample : trainData) {
-                        Point point = (Point)sample;
-                        double x = point.getX() * w + NODE_SIZE / 2;
-                        double y = point.getY() * w + NODE_SIZE / 2;
-                        gc.strokeArc(xs + x, ys + y, 2, 2, 0, 360, ArcType.ROUND);
-                    }
-                }
-            }
-        }
-
-    }
-
-    private Paint getColor(double value) {
-        double index = ActivationFunction.SIGMOID.output.apply(value) * (colorMap.length - 1);
-        return colorMap[(int) index];
+        ChartUtils.drawLineChart(lossCanvas, trainLossArray);
+        problem.getValue().drawNetwork(networkCanvas, network, trainData);
     }
 
     private void drawColors() {
         GraphicsContext gc = colorMapCanvas.getGraphicsContext2D();
-        double w = colorMapCanvas.getWidth() / colorMap.length;
-        for (int i = 0; i < colorMap.length; i++) {
-            gc.setStroke(colorMap[i]);
+        double w = colorMapCanvas.getWidth() / COLOR_MAP.length;
+        for (int i = 0; i < COLOR_MAP.length; i++) {
+            gc.setStroke(COLOR_MAP[i]);
             double x = w * i;
             gc.strokeRect(x, 0, w, colorMapCanvas.getHeight());
         }
@@ -212,14 +163,13 @@ public class MainController {
         trainLossArray.clear();
         iteration = 0;
         trainLoss = 1;
-        problem = new CircleProblem();
-        features = problem.getFeatures();
-        trainData = problem.createSamples(SAMPLES_COUNT);
+        trainData = problem.getValue().createSamples(SAMPLES_COUNT);
         network = Network.buildNetwork(Arrays.asList(2, 8, 8, 1),
                 activation.getValue(),
                 ActivationFunction.TANH,
                 regularization.getValue(),
                 false);
+        draw();
     }
 
     void stopRun() {
@@ -238,7 +188,7 @@ public class MainController {
     double getLoss(List<Sample> samples) {
         double loss = 0;
         for (Sample sample : samples) {
-            List<Double> inputs = features.stream().map(it -> it.getInput(sample)).collect(Collectors.toList());
+            List<Double> inputs = problem.getValue().getInputs(sample);
             double output = network.forwardProp(inputs);
             loss += ErrorFunction.SQUARE.error.applyAsDouble(output, sample.getValue());
         }
@@ -249,7 +199,7 @@ public class MainController {
         iteration++;
         for (int i = 0; i < trainData.size(); i++) {
             Sample sample = trainData.get(i);
-            List<Double> inputs = features.stream().map(it -> it.getInput(sample)).collect(Collectors.toList());
+            List<Double> inputs = problem.getValue().getInputs(sample);
             network.forwardProp(inputs);
             network.backProp(sample.getValue(), ErrorFunction.SQUARE);
             if ((i + 1) % batchSize.getValue() == 0) {

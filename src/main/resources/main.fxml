@@ -39,7 +39,7 @@
             <VBox id="settings" spacing="5">
                 <HBox>
                     <Label>Problem</Label>
-                    <ComboBox fx:id="problemBox"></ComboBox>
+                    <ComboBox fx:id="problem"></ComboBox>
                 </HBox>
                 <HBox>
                     <Label>Noise</Label>
@@ -75,6 +75,6 @@
         </HBox>
     </left>
     <center>
-        <Canvas fx:id="networkCanvas" width="600" height="600"></Canvas>
+        <Canvas fx:id="networkCanvas"></Canvas>
     </center>
 </BorderPane>
