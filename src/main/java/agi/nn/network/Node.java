@@ -10,7 +10,6 @@ import java.util.List;
  * (total input, output, and their respectively derivatives) which changes
  * after every forward and back propagation run.
  */
-@Data
 public class Node {
     String id;
     List<Link> inputLinks = new LinkedList<>();
@@ -37,6 +36,10 @@ public class Node {
 
     /** Activation function that takes total input and returns node's output */
     ActivationFunction activation;
+
+    public double getOutput() {
+        return output;
+    }
 
     /**
      * Creates a new node with the provided id and activation function.

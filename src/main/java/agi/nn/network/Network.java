@@ -169,7 +169,7 @@ public class Network {
                     if (link.isDead) {
                         continue;
                     }
-                    double regulDer = link.regularization != null ? link.regularization.der.apply(link.weight) : 0;
+                    double regulDer = link.regularization != RegularizationFunction.None ? link.regularization.der.apply(link.weight) : 0;
                     if (link.numAccumulatedDers > 0) {
                         // Update the weight based on dE/dw.
                         link.weight = link.weight - (learningRate / link.numAccumulatedDers) * link.accErrorDer;
