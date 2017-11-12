@@ -1,20 +1,20 @@
 package agi.nn.problem.points;
 
-import agi.nn.network.ActivationFunction;
-import agi.nn.network.Network;
-import agi.nn.network.Node;
+import agi.nn.network.*;
 import agi.nn.problem.Problem;
+import agi.nn.problem.Sample;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static agi.nn.ui.ChartUtils.COLOR_MAP;
 
-public abstract class PointProblem implements Problem<Point> {
+public abstract class PointProblem extends Problem<Point> {
     private static final int DATA_SIZE = 50;
     private static final int VISUAL_SIZE = 300;
 
@@ -30,8 +30,28 @@ public abstract class PointProblem implements Problem<Point> {
     }
 
     @Override
+    public Network buildNetwork(int layers, int nodes, ActivationFunction activationFunction, RegularizationFunction regularizationFunction) {
+        List<Integer> shape = new ArrayList<>();
+        shape.add(2);
+        for(int i=0; i<layers; i++) {
+            shape.add(nodes);
+        }
+        shape.add(1);
+        return Network.buildNetwork(shape,
+                activationFunction,
+                ActivationFunction.TANH,
+                regularizationFunction);
+    }
+
+    @Override
     public List<Double> getInputs(Point sample) {
         return Arrays.asList(sample.x, sample.y);
+    }
+
+    @Override
+    public double getLoss(Network network, Point sample) {
+        double output = network.getOutputLayer().get(0).getOutput();
+        return ErrorFunction.SQUARE.error.applyAsDouble(output, sample.getValue());
     }
 
     @Override

@@ -47,6 +47,14 @@
                 </HBox>
                 <Separator></Separator>
                 <HBox>
+                    <Label>Hidden layers</Label>
+                    <TextField fx:id="hiddenLayers"></TextField>
+                </HBox>
+                <HBox>
+                    <Label>Nodes count</Label>
+                    <TextField fx:id="nodesCount"></TextField>
+                </HBox>
+                <HBox>
                     <Label>Batch size</Label>
                     <ComboBox fx:id="batchSize"></ComboBox>
                 </HBox>

@@ -11,10 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.ArcType;
@@ -44,6 +41,8 @@ public class MainController {
     public Canvas colorMapCanvas;
     public Canvas lossCanvas;
     public Canvas networkCanvas;
+    public TextField hiddenLayers;
+    public TextField nodesCount;
 
     int iteration;
     List<Sample> trainData;
@@ -83,10 +82,10 @@ public class MainController {
     }
 
     private void initControls() {
-        //TODO: configure network topology
+        hiddenLayers.setText("1");
+        nodesCount.setText("10");
 
-        ObservableList<Problem> problems = FXCollections.observableArrayList(
-                Arrays.asList(new CircleProblem(), new SpiralProblem(), new SinusProblem()));
+        ObservableList<Problem> problems = FXCollections.observableArrayList(Problem.VALUES);
         problem.setItems(problems);
         problem.setValue(problems.get(0));
 
@@ -163,12 +162,10 @@ public class MainController {
         trainLossArray.clear();
         iteration = 0;
         trainLoss = 1;
+        int layers = Integer.valueOf(hiddenLayers.getText());
+        int nodes = Integer.valueOf(nodesCount.getText());
         trainData = problem.getValue().createSamples(SAMPLES_COUNT);
-        network = Network.buildNetwork(Arrays.asList(2, 8, 8, 1),
-                activation.getValue(),
-                ActivationFunction.TANH,
-                regularization.getValue(),
-                false);
+        network = problem.getValue().buildNetwork(layers, nodes, activation.getValue(), regularization.getValue());
         draw();
     }
 
@@ -189,8 +186,8 @@ public class MainController {
         double loss = 0;
         for (Sample sample : samples) {
             List<Double> inputs = problem.getValue().getInputs(sample);
-            double output = network.forwardProp(inputs);
-            loss += ErrorFunction.SQUARE.error.applyAsDouble(output, sample.getValue());
+            network.forwardProp(inputs);
+            loss += problem.getValue().getLoss(network, sample);
         }
         return loss / samples.size();
     }

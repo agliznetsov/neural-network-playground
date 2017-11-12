@@ -1,5 +1,7 @@
 package agi.nn.problem.points;
 
+import agi.nn.problem.Problem;
+
 import java.util.ArrayList;
 import java.util.List;
 

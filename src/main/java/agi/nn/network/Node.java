@@ -44,12 +44,9 @@ public class Node {
     /**
      * Creates a new node with the provided id and activation function.
      */
-    public Node(String id, ActivationFunction activation, boolean initZero) {
+    public Node(String id, ActivationFunction activation) {
         this.id = id;
         this.activation = activation;
-        if (initZero) {
-            this.bias = 0;
-        }
     }
 
     /** Recomputes the node's output and returns it. */

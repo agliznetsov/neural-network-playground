@@ -32,14 +32,10 @@ public class Link {
      *     penalty for this weight. If null, there will be no regularization.
      */
     public Link(Node source, Node dest,
-                RegularizationFunction regularization,
-                boolean initZero) {
+                RegularizationFunction regularization) {
         this.id = source.id + "-" + dest.id;
         this.source = source;
         this.dest = dest;
         this.regularization = regularization;
-        if (initZero) {
-            this.weight = 0;
-        }
     }
 }

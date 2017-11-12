@@ -2,7 +2,6 @@ package agi.nn.network;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class Network {
     private List<List<Node>> nodes = new LinkedList<>();
@@ -26,8 +25,7 @@ public class Network {
             List<Integer> networkShape,
             ActivationFunction activation,
             ActivationFunction outputActivation,
-            RegularizationFunction regularization,
-            boolean initZero)
+            RegularizationFunction regularization)
 
     {
         Network network = new Network();
@@ -43,13 +41,13 @@ public class Network {
             for (int i = 0; i < numNodes; i++) {
                 String nodeId = String.valueOf(id);
                 id++;
-                Node node = new Node(nodeId, isOutputLayer ? outputActivation : activation, initZero);
+                Node node = new Node(nodeId, isOutputLayer ? outputActivation : activation);
                 currentLayer.add(node);
                 if (layerIdx >= 1) {
                     // Add links from nodes in the previous layer to this node.
                     for (int j = 0; j < network.nodes.get(layerIdx - 1).size(); j++) {
                         Node prevNode = network.nodes.get(layerIdx - 1).get(j);
-                        Link link = new Link(prevNode, node, regularization, initZero);
+                        Link link = new Link(prevNode, node, regularization);
                         prevNode.outputs.add(link);
                         node.inputLinks.add(link);
                     }
@@ -70,9 +68,8 @@ public class Network {
      *
      * @param inputs The input array. Its size() should match the number of input
      *               nodes in the nodes.
-     * @return The final output of the nodes.
      */
-    public double forwardProp(List<Double> inputs) {
+    public void forwardProp(List<Double> inputs) {
         List<Node> inputLayer = nodes.get(0);
         if (inputs.size() != inputLayer.size()) {
             throw new Error("The number of inputs must match the number of nodes in the input layer");
@@ -90,7 +87,6 @@ public class Network {
                 node.updateOutput();
             }
         }
-        return nodes.get(nodes.size() - 1).get(0).output;
     }
 
     /**
@@ -190,24 +186,8 @@ public class Network {
         }
     }
 
-    /**
-     * Iterates over every node in the nodes/
-     */
-    public void forEachNode(boolean ignoreInputs, Consumer<Node> accessor) {
-        for (int layerIdx = ignoreInputs ? 1 : 0; layerIdx < nodes.size(); layerIdx++) {
-            List<Node> currentLayer = nodes.get(layerIdx);
-            for (int i = 0; i < currentLayer.size(); i++) {
-                Node node = currentLayer.get(i);
-                accessor.accept(node);
-            }
-        }
-    }
-
-    /**
-     * Returns the output node in the nodes.
-     */
-    public Node getOutputNode() {
-        return nodes.get(nodes.size() - 1).get(0);
+    public List<Node> getOutputLayer() {
+        return nodes.get(nodes.size() - 1);
     }
 
 }

@@ -1,11 +1,14 @@
 package agi.nn.problem.points;
 
+import agi.nn.problem.Problem;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import static agi.nn.ui.ChartUtils.randUniform;
 
 public class CircleProblem extends PointProblem {
+
     public CircleProblem() {
         super(5);
     }
