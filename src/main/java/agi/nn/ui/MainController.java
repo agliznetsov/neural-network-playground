@@ -1,26 +1,23 @@
 package agi.nn.ui;
 
-import agi.nn.network.*;
-import agi.nn.problem.Feature;
+import agi.nn.network.ActivationFunction;
+import agi.nn.network.ErrorFunction;
+import agi.nn.network.Network;
+import agi.nn.network.RegularizationFunction;
 import agi.nn.problem.Problem;
 import agi.nn.problem.Sample;
-import agi.nn.problem.points.*;
 import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.ArcType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static agi.nn.ui.ChartUtils.COLOR_MAP;
 
 public class MainController {
     private static final int SAMPLES_COUNT = 250;
@@ -38,7 +35,6 @@ public class MainController {
     public Label iterationLabel;
     public Label lossLabel;
     public Label ipsLabel;
-    public Canvas colorMapCanvas;
     public Canvas lossCanvas;
     public Canvas networkCanvas;
     public TextField hiddenLayers;
@@ -78,7 +74,6 @@ public class MainController {
             }
         };
         reset();
-        drawColors();
     }
 
     private void initControls() {
@@ -88,6 +83,7 @@ public class MainController {
         ObservableList<Problem> problems = FXCollections.observableArrayList(Problem.VALUES);
         problem.setItems(problems);
         problem.setValue(problems.get(0));
+        problem.valueProperty().addListener((observable, oldValue, newValue) -> onReset(null));
 
         ObservableList<Double> ratios = FXCollections.observableArrayList(Arrays.asList(0.00001, 0.0001, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0));
 
@@ -144,18 +140,6 @@ public class MainController {
         lossLabel.setText(String.format("%.4f", trainLoss));
         ChartUtils.drawLineChart(lossCanvas, trainLossArray);
         problem.getValue().drawNetwork(networkCanvas, network, trainData);
-    }
-
-    private void drawColors() {
-        GraphicsContext gc = colorMapCanvas.getGraphicsContext2D();
-        double w = colorMapCanvas.getWidth() / COLOR_MAP.length;
-        for (int i = 0; i < COLOR_MAP.length; i++) {
-            gc.setStroke(COLOR_MAP[i]);
-            double x = w * i;
-            gc.strokeRect(x, 0, w, colorMapCanvas.getHeight());
-        }
-        gc.setStroke(Color.BLACK);
-        gc.strokeRect(0, 0, colorMapCanvas.getWidth(), colorMapCanvas.getHeight());
     }
 
     void reset() {

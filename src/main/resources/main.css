@@ -30,6 +30,10 @@
     -fx-min-width: 100px;
 }
 
+#settings TextField {
+    -fx-max-width: 100px;
+}
+
 #error {
     -fx-text-fill: red;
     -fx-font-size: 18px;

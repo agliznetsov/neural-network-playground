@@ -1,32 +1,52 @@
 package agi.nn.ui;
 
-import java.util.LinkedList;
-
 public class LoopArray {
     private int maxSize;
-    private LinkedList<Double> values;
+    private int end;
+    private int start;
+    private double[] values;
 
     public LoopArray(int maxSize) {
         this.maxSize = maxSize;
-        this.values = new LinkedList<Double>();
+        this.values = new double[maxSize];
     }
 
     public int getSize() {
-        return values.size();
+        int size = end - start;
+        if (size > 0)
+            return size;
+        else if (size < 0)
+            return maxSize;
+        else
+            return 0;
     }
 
     public double get(int i) {
-        return values.get(i);
+        int index = start + i;
+        if (index >= maxSize) {
+            index -= maxSize;
+        }
+        return values[index];
     }
 
     public void add(double value) {
-        values.add(value);
-        if (values.size() > maxSize) {
-            values.remove(0);
+        end = increment(end);
+        values[end] = value;
+        if (end == start) {
+            start = increment(start);
         }
     }
 
+    private int increment(int i) {
+        int res = i + 1;
+        if (res == maxSize) {
+            res = 0;
+        }
+        return res;
+    }
+
     public void clear() {
-        this.values.clear();
+        start = 0;
+        end = 0;
     }
 }
