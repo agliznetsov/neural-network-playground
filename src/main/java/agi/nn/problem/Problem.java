@@ -4,6 +4,7 @@ import agi.nn.network.ActivationFunction;
 import agi.nn.network.Network;
 import agi.nn.network.RegularizationFunction;
 import agi.nn.problem.function.FunctionProblem;
+import agi.nn.problem.mnist.MnistProblem;
 import agi.nn.problem.points.CircleProblem;
 import agi.nn.problem.points.SinusProblem;
 import agi.nn.problem.points.SpiralProblem;
@@ -15,17 +16,16 @@ import java.util.List;
 
 public abstract class Problem<T extends Sample> {
     public static final List<Problem> VALUES = Arrays.asList(
+            new CircleProblem(),
+            new SpiralProblem(),
             new FunctionProblem("Sinus", x -> Math.sin(x)),
             new FunctionProblem("X*X", x -> Math.pow(x, 2)),
-            new CircleProblem(),
-            new SpiralProblem()
+            new MnistProblem()
     );
 
     public abstract String getName();
 
-    public abstract List<Double> getInputs(T sample);
-
-    public abstract List<T> createSamples(int count);
+    public abstract List<T> createSamples();
 
     public abstract void drawNetwork(Canvas canvas, Network network, List<T> trainData);
 

@@ -1,5 +1,7 @@
 package agi.nn.ui;
 
+import java.util.Arrays;
+
 public class LoopArray {
     private int maxSize;
     private int end;
@@ -27,6 +29,10 @@ public class LoopArray {
             index -= maxSize;
         }
         return values[index];
+    }
+
+    public double getMax() {
+        return Arrays.stream(values).max().getAsDouble();
     }
 
     public void add(double value) {

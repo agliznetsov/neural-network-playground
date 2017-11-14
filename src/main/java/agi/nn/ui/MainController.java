@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MainController {
-    private static final int SAMPLES_COUNT = 250;
     private static final long SECOND = 1000000000;
     private static final long FRAME_DURATION = SECOND / 20;
 
@@ -39,18 +38,25 @@ public class MainController {
     public Canvas networkCanvas;
     public TextField hiddenLayers;
     public TextField nodesCount;
-
-    int iteration;
-    List<Sample> trainData;
-    Network network;
-    LoopArray trainLossArray = new LoopArray(2000);
-    double trainLoss;
+    public Label sampleLabel;
+    public Label spsLabel;
 
     AnimationTimer animationTimer;
+
+    Network network;
+    List<Sample> trainData;
+    LoopArray trainLossArray = new LoopArray(2000);
+    int iteration;
+    int sampleIndex;
+    int sampleCount;
+    double maxLoss;
+    double trainLoss;
     boolean running;
     long start = 0;
-    long step = 0;
+    long startSampleCount = 0;
+    long startIteration = 0;
     double ips = 0;
+    double sps = 0;
 
     public void initialize() {
         System.out.println("init");
@@ -58,19 +64,7 @@ public class MainController {
         animationTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                while (System.nanoTime() - now < FRAME_DURATION) {
-                    oneStep();
-                    step++;
-                }
-
-                long duration = (now - start);
-                if (duration > SECOND) {
-                    ips = step / (duration * 1.0 / SECOND);
-                    step = 0;
-                    start = System.nanoTime();
-                }
-
-                draw();
+                onTimer(now);
             }
         };
         reset();
@@ -134,21 +128,47 @@ public class MainController {
         draw();
     }
 
+    private void onTimer(long now) {
+        while (System.nanoTime() - now < FRAME_DURATION) {
+            oneStep();
+        }
+
+        long duration = (System.nanoTime() - start);
+        if (duration > SECOND) {
+            ips = (iteration - startIteration) / (duration * 1.0 / SECOND);
+            sps = (startSampleCount - sampleCount) / (duration * 1.0 / SECOND);
+            startIteration = 0;
+            startSampleCount = 0;
+            start = System.nanoTime();
+        }
+
+        draw();
+    }
+
     private void draw() {
         iterationLabel.setText(String.format("%,d", iteration));
         ipsLabel.setText(String.format("%.1f", ips));
+        sampleLabel.setText(String.format("%06d", sampleIndex));
+        spsLabel.setText(String.format("%.1f", sps));
         lossLabel.setText(String.format("%.4f", trainLoss));
-        ChartUtils.drawLineChart(lossCanvas, trainLossArray);
+        ChartUtils.drawLineChart(lossCanvas, trainLossArray, maxLoss);
         problem.getValue().drawNetwork(networkCanvas, network, trainData);
     }
 
     void reset() {
         trainLossArray.clear();
+        sampleIndex = 0;
+        sampleCount = 0;
         iteration = 0;
-        trainLoss = 1;
+        startIteration = 0;
+        startSampleCount = 0;
+        trainLoss = 0;
+        maxLoss = 0;
+        ips = 0;
+        sps = 0;
         int layers = Integer.valueOf(hiddenLayers.getText());
         int nodes = Integer.valueOf(nodesCount.getText());
-        trainData = problem.getValue().createSamples(SAMPLES_COUNT);
+        trainData = problem.getValue().createSamples();
         network = problem.getValue().buildNetwork(layers, nodes, activation.getValue(), regularization.getValue());
         draw();
     }
@@ -169,27 +189,28 @@ public class MainController {
     double getLoss(List<Sample> samples) {
         double loss = 0;
         for (Sample sample : samples) {
-            List<Double> inputs = problem.getValue().getInputs(sample);
-            network.forwardProp(inputs);
+            network.forwardProp(sample.getInputs());
             loss += problem.getValue().getLoss(network, sample);
         }
         return loss / samples.size();
     }
 
     void oneStep() {
-        iteration++;
-        for (int i = 0; i < trainData.size(); i++) {
-            Sample sample = trainData.get(i);
-            List<Double> inputs = problem.getValue().getInputs(sample);
-            network.forwardProp(inputs);
-            network.backProp(sample.getValue(), ErrorFunction.SQUARE);
-            if ((i + 1) % batchSize.getValue() == 0) {
-                network.updateWeights(learningRate.getValue(), regularizationRate.getValue());
-            }
+        Sample sample = trainData.get(sampleIndex);
+        network.forwardProp(sample.getInputs());
+        network.backProp(sample.getTargets(), ErrorFunction.SQUARE);
+        if ((sampleIndex) % batchSize.getValue() == 0) {
+            network.updateWeights(learningRate.getValue(), regularizationRate.getValue());
         }
-        trainLoss = getLoss(trainData);
-        trainLossArray.add(trainLoss);
-//        testLoss = getLoss(network, testData);
+        sampleIndex++;
+        if (sampleIndex == trainData.size()) {
+            sampleIndex = 0;
+            iteration++;
+
+            trainLoss = getLoss(trainData);
+            trainLossArray.add(trainLoss);
+            maxLoss = Math.max(maxLoss, trainLoss);
+        }
     }
 
 }

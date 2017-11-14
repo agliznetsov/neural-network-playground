@@ -1,7 +1,5 @@
 package agi.nn.network;
 
-import lombok.Data;
-
 import java.util.LinkedList;
 import java.util.List;
 

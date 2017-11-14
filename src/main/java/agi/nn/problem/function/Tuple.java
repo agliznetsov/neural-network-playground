@@ -2,24 +2,30 @@ package agi.nn.problem.function;
 
 import agi.nn.problem.Sample;
 
-public class Tuple implements Sample{
-    public final double x, y;
+public class Tuple implements Sample {
+    double[] inputs;
+    double[] targets;
 
     public double getX() {
-        return x;
+        return inputs[0];
     }
 
     public double getY() {
-        return y;
+        return targets[0];
     }
 
     @Override
-    public double getValue() {
-        return y;
+    public double[] getInputs() {
+        return inputs;
+    }
+
+    @Override
+    public double[] getTargets() {
+        return targets;
     }
 
     public Tuple(double x, double y) {
-        this.x = x;
-        this.y = y;
+        inputs = new double[]{x};
+        targets = new double[]{y};
     }
 }

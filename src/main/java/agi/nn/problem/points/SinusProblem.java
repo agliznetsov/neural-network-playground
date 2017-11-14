@@ -15,7 +15,8 @@ public class SinusProblem extends PointProblem {
     }
 
     @Override
-    public List<Point> createSamples(int count) {
+    public List<Point> createSamples() {
+        int count = SAMPLES_COUNT;
         List<Point> points = new ArrayList<>(count);
         double w = radius * 2 / count;
         double d = radius / 4;

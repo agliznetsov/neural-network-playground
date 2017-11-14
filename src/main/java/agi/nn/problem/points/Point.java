@@ -1,28 +1,35 @@
 package agi.nn.problem.points;
 
 import agi.nn.problem.Sample;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-public class Point implements Sample{
-    public final double x, y, value;
+public class Point implements Sample {
+    final double[] inputs;
+    final double[] targets;
 
     public double getX() {
-        return x;
+        return inputs[0];
     }
 
     public double getY() {
-        return y;
+        return inputs[1];
+    }
+
+    public double getValue() {
+        return targets[0];
     }
 
     @Override
-    public double getValue() {
-        return value;
+    public double[] getInputs() {
+        return inputs;
+    }
+
+    @Override
+    public double[] getTargets() {
+        return targets;
     }
 
     public Point(double x, double y, double value) {
-        this.x = x;
-        this.y = y;
-        this.value = value;
+        inputs = new double[]{x, y};
+        targets = new double[]{value};
     }
 }

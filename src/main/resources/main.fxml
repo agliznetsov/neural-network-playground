@@ -18,16 +18,24 @@
                     <Button onAction="#onStep">Step</Button>
                 </HBox>
                 <HBox spacing="5" alignment="CENTER_LEFT">
-                    <Label>Iteration</Label>
+                    <Label>Epoch</Label>
                     <Label styleClass="bold" fx:id="iterationLabel">0</Label>
                 </HBox>
                 <HBox spacing="5" alignment="CENTER_LEFT">
-                    <Label>IPS</Label>
-                    <Label styleClass="bold" fx:id="ipsLabel">0</Label>
+                    <Label>Sample</Label>
+                    <Label styleClass="bold" fx:id="sampleLabel">0</Label>
                 </HBox>
                 <HBox spacing="5" alignment="CENTER_LEFT">
                     <Label>Loss</Label>
                     <Label styleClass="bold" fx:id="lossLabel">0</Label>
+                </HBox>
+                <HBox spacing="5" alignment="CENTER_LEFT">
+                    <Label>EPS</Label>
+                    <Label styleClass="bold" fx:id="ipsLabel">0</Label>
+                </HBox>
+                <HBox spacing="5" alignment="CENTER_LEFT">
+                    <Label>SPS</Label>
+                    <Label styleClass="bold" fx:id="spsLabel">0</Label>
                 </HBox>
                 <Label fx:id="error"></Label>
             </HBox>

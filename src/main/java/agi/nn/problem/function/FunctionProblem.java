@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.function.DoubleFunction;
 
 public class FunctionProblem extends Problem<Tuple> {
+    private static final int SAMPLES_COUNT = 100;
     private static final int VISUAL_SIZE = 500;
     private static final int DATA_SIZE = 20;
 
@@ -48,12 +49,8 @@ public class FunctionProblem extends Problem<Tuple> {
     }
 
     @Override
-    public List<Double> getInputs(Tuple sample) {
-        return Arrays.asList(sample.x);
-    }
-
-    @Override
-    public List<Tuple> createSamples(int count) {
+    public List<Tuple> createSamples() {
+        int count = SAMPLES_COUNT;
         double w = DATA_SIZE * 1.0 / count;
         List<Tuple> samples = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
@@ -67,7 +64,7 @@ public class FunctionProblem extends Problem<Tuple> {
     @Override
     public double getLoss(Network network, Tuple sample) {
         double output = network.getOutputLayer().get(0).getOutput();
-        double res = ErrorFunction.SQUARE.error.applyAsDouble(output, sample.getValue());
+        double res = ErrorFunction.SQUARE.error.applyAsDouble(output, sample.getY());
         return res;
     }
 
@@ -88,12 +85,12 @@ public class FunctionProblem extends Problem<Tuple> {
         gc.setFill(Color.BLACK);
         double[] xPoints = new double[trainData.size()];
         double[] yPoints = new double[trainData.size()];
-        for (int i=0;i<trainData.size(); i++) {
+        for (int i = 0; i < trainData.size(); i++) {
             Tuple tuple = trainData.get(i);
             double x = tuple.getX() * w + VISUAL_SIZE / 2;
             double y = VISUAL_SIZE - (tuple.getY() * w + VISUAL_SIZE / 2);
             gc.fillOval(x - 2, +y - 2, 4, 4);
-            network.forwardProp(getInputs(tuple));
+            network.forwardProp(tuple.getInputs());
             double v = nodes.get(0).getOutput();
             xPoints[i] = x;
             yPoints[i] = VISUAL_SIZE - (v * w + VISUAL_SIZE / 2);

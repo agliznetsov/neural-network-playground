@@ -1,5 +1,6 @@
 package agi.nn.problem;
 
 public interface Sample {
-    double getValue();
+    double[] getInputs();
+    double[] getTargets();
 }

@@ -69,15 +69,15 @@ public class Network {
      * @param inputs The input array. Its size() should match the number of input
      *               nodes in the nodes.
      */
-    public void forwardProp(List<Double> inputs) {
+    public void forwardProp(double[] inputs) {
         List<Node> inputLayer = nodes.get(0);
-        if (inputs.size() != inputLayer.size()) {
+        if (inputs == null || inputs.length != inputLayer.size()) {
             throw new Error("The number of inputs must match the number of nodes in the input layer");
         }
         // Update the input layer.
         for (int i = 0; i < inputLayer.size(); i++) {
             Node node = inputLayer.get(i);
-            node.output = inputs.get(i);
+            node.output = inputs[i];
         }
         for (int layerIdx = 1; layerIdx < nodes.size(); layerIdx++) {
             List<Node> currentLayer = nodes.get(layerIdx);
@@ -96,11 +96,14 @@ public class Network {
      * derivatives with respect to each node, and each weight
      * in the nodes.
      */
-    public void backProp(double target, ErrorFunction errorFunc) {
+    public void backProp(double[] targets, ErrorFunction errorFunc) {
         // The output node is a special case. We use the user-defined error
         // function for the derivative.
-        Node outputNode = nodes.get(nodes.size() - 1).get(0);
-        outputNode.outputDer = errorFunc.der.applyAsDouble(outputNode.output, target);
+        List<Node> outputLayer = getOutputLayer();
+        for(int i=0; i<outputLayer.size(); i++) {
+            Node node = outputLayer.get(0);
+            node.outputDer = errorFunc.der.applyAsDouble(node.output, targets[i]);
+        }
 
         // Go through the layers backwards.
         for (int layerIdx = nodes.size() - 1; layerIdx >= 1; layerIdx--) {
